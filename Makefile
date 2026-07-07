@@ -18,6 +18,21 @@ help: ## Help message
 	| awk 'BEGIN {FS = ":.*## "}; \
 	{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
+install: ## Install project dependencies and prepare environment
+	@echo "Installing Go dependencies..."
+	@go mod download
+
+	@echo "Starting PostgreSQL..."
+	@$(DOCKER_COMP) up -d todo-postgres
+
+	@echo "Running migrations..."
+	@$(MAKE) migrate-up
+
+	@echo "Project is ready."
+
+run: ## Run application
+	@$(DOCKER_COMP) up --build -d todo
+
 
 env-up: ## Build postgres containers
 	@$(DOCKER_COMP) up -d todo-postgres
