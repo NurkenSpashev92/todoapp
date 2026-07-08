@@ -27,7 +27,7 @@ func NewHTTPServer(config Config, log *core_logger.Logger) *HTTPServer {
 
 func (h *HTTPServer) RegiserAPIRoutes(routers ...*APIVersionRouter) {
 	for _, router := range routers {
-		prefix := "/api" + string(router.apiVersion)
+		prefix := "/api/" + string(router.apiVersion)
 
 		h.mux.Handle(
 			prefix+"/",
