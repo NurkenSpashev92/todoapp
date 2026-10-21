@@ -23,7 +23,7 @@ install: ## Install project dependencies and prepare environment
 	@go mod download
 
 	@echo "Starting PostgreSQL..."
-	@$(DOCKER_COMP) up -d todo-postgres
+	@$(DOCKER_COMP) up -d postgresql_todo
 
 	@echo "Running migrations..."
 	@$(MAKE) migrate-up
@@ -31,19 +31,20 @@ install: ## Install project dependencies and prepare environment
 	@echo "Project is ready."
 
 start: ## Run application locally via go run (postgres in docker)
-	@$(DOCKER_COMP) up -d todo-postgres
-	@go run ./cmd/todoapp
+	@$(DOCKER_COMP) stop todo
+	@$(DOCKER_COMP) up -d --wait postgresql_todo
+	@POSTGRES_HOST=localhost go run ./cmd/todoapp
 
 run: ## Run application
 	@$(DOCKER_COMP) up --build -d todo
 
 
 env-up: ## Build postgres containers
-	@$(DOCKER_COMP) up -d todo-postgres
+	@$(DOCKER_COMP) up -d postgresql_todo
 
 
 env-down: ## Down postgres containers
-	@$(DOCKER_COMP) down todo-postgres
+	@$(DOCKER_COMP) down postgresql_todo
 
 
 migrate-create: ## Create migrations (use: make migrate-create seq=name)
@@ -70,5 +71,5 @@ migrate-down: ## Rollback migrations
 migrate-action:
 	@$(DOCKER_COMP) run --rm todo-migrate \
 		-path /migrations \
-		-database postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@todo-postgres:5432/$(POSTGRES_DB)?sslmode=disable \
+		-database postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgresql_todo:5432/$(POSTGRES_DB)?sslmode=disable \
 		$(action)

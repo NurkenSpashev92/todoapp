@@ -10,12 +10,15 @@ services:
       - .:/app
     env_file:
       - .env
+    environment:
+      POSTGRES_HOST: postgresql_todo
     depends_on:
-      - todo-postgres
+      postgresql_todo:
+        condition: service_healthy
     ports:
       - "8080:8080"
 
-  todo-postgres:
+  postgresql_todo:
     image: postgres:18.4-alpine
     container_name: postgresql_todo
     env_file:
@@ -24,7 +27,7 @@ services:
       - ${PROJECT_ROOT}/out/pgdata:/var/lib/postgresql
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s
       timeout: 3s
       retries: 15
@@ -38,5 +41,5 @@ services:
     volumes:
       - ${PROJECT_ROOT}/migrations:/migrations
     depends_on:
-      todo-postgres:
+      postgresql_todo:
         condition: service_healthy

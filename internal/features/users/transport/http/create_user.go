@@ -3,10 +3,10 @@ package users_transport_http
 import (
 	"net/http"
 
-	"go.uber.org/zap"
-
+	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 	core_logger "github.com/nurkenspashev92/todoapp/internal/core/logger"
 	core_http_request "github.com/nurkenspashev92/todoapp/internal/core/transport/http/request"
+	core_http_response "github.com/nurkenspashev92/todoapp/internal/core/transport/http/response"
 )
 
 type CreateUserRequest struct {
@@ -26,31 +26,36 @@ func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
+	responseHandler := core_http_response.NewHTTPResponseHander(log, rw)
 
 	log.Debug("invoke CreateUser handler")
 
 	if err := core_http_request.DecodeAndValidate(r, &request); err != nil {
-		log.Error("error decode json body", zap.String("message", err.Error()))
-		http.Error(rw, "invalid json body", http.StatusBadRequest)
+		responseHandler.ErrorResponse(err, "failed to decode and validate HTTP request")
 		return
 	}
 
-	rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	rw.WriteHeader(http.StatusOK)
+	user := dominFromDTO(request)
+	userDomain, err := h.userService.CreateUser(ctx, user)
+	if err != nil {
+		responseHandler.ErrorResponse(err, "failed to create")
+		return
+	}
+
+	response := dtoFromDomain(userDomain)
+
+	responseHandler.JSONRender(response, http.StatusCreated)
 }
 
-func (h *UsersHTTPHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	log := core_logger.FromContext(ctx)
+func dominFromDTO(dto CreateUserRequest) domain.User {
+	return domain.NewUserUninitialized(dto.FullName, dto.PhoneNumber)
+}
 
-	log.Debug("invoke CreateUser handler")
-
-	if _, err := rw.Write([]byte("Hello world")); err != nil {
-		log.Error("error decode json body", zap.String("message", err.Error()))
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
+func dtoFromDomain(user domain.User) CreateUserResponse {
+	return CreateUserResponse{
+		ID:          user.ID,
+		Version:     user.Version,
+		FullName:    user.FullName,
+		PhoneNumber: user.PhoneNumber,
 	}
-
-	rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	rw.WriteHeader(http.StatusOK)
 }
