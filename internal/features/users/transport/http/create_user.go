@@ -1,17 +1,17 @@
 package users_transport_http
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"go.uber.org/zap"
 
 	core_logger "github.com/nurkenspashev92/todoapp/internal/core/logger"
+	core_http_request "github.com/nurkenspashev92/todoapp/internal/core/transport/http/request"
 )
 
 type CreateUserRequest struct {
-	FullName    string  `json:"full_name"`
-	PhoneNumber *string `json:"phone_number"`
+	FullName    string  `json:"full_name" validate:"required,min=3,max=100"`
+	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"`
 }
 
 type CreateUserResponse struct {
@@ -29,7 +29,7 @@ func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 	log.Debug("invoke CreateUser handler")
 
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	if err := core_http_request.DecodeAndValidate(r, &request); err != nil {
 		log.Error("error decode json body", zap.String("message", err.Error()))
 		http.Error(rw, "invalid json body", http.StatusBadRequest)
 		return
