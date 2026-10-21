@@ -9,7 +9,7 @@ APP = $(DOCKER_EXEC) todo
 
 PROJECT_DIR=$(shell dirname $(realpath $(MAKEFILE_LIST)))
 
-.PHONY: help env-up env-down migrate-create migrate-up migrate-down migrate-action
+.PHONY: help install start run env-up env-down migrate-create migrate-up migrate-down migrate-action
 
 
 help: ## Help message
@@ -29,6 +29,10 @@ install: ## Install project dependencies and prepare environment
 	@$(MAKE) migrate-up
 
 	@echo "Project is ready."
+
+start: ## Run application locally via go run (postgres in docker)
+	@$(DOCKER_COMP) up -d todo-postgres
+	@go run ./cmd/todoapp
 
 run: ## Run application
 	@$(DOCKER_COMP) up --build -d todo

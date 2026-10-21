@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: todo
     working_dir: /app
-    command: go run ./cmd/todoapp
+    command: air -c .air.toml
     volumes:
       - .:/app
     env_file:
@@ -21,8 +21,13 @@ services:
     env_file:
       - .env
     volumes:
-      - ${PROJECT_ROOT}/out/pgdata:/var/lib/postgresql/data
+      - ${PROJECT_ROOT}/out/pgdata:/var/lib/postgresql
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
     ports:
       - "5432:5432"
 
@@ -32,3 +37,6 @@ services:
       - .env
     volumes:
       - ${PROJECT_ROOT}/migrations:/migrations
+    depends_on:
+      todo-postgres:
+        condition: service_healthy

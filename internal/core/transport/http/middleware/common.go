@@ -83,7 +83,7 @@ func Trace() Middleware {
 				zap.Time("time", before.UTC()),
 			)
 
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(rw, r)
 
 			log.Debug(
 				"<<< done HTTP request",
