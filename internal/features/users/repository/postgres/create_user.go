@@ -24,7 +24,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user domain.User) (doma
 		&userModel.ID,
 		&userModel.Version,
 		&userModel.FullName,
-		&userModel.PhoneNUmber,
+		&userModel.PhoneNumber,
 	)
 	if err != nil {
 		return domain.User{}, fmt.Errorf("scan error: %w", err)
@@ -34,7 +34,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user domain.User) (doma
 		userModel.ID,
 		userModel.Version,
 		userModel.FullName,
-		userModel.PhoneNUmber,
+		userModel.PhoneNumber,
 	)
 
 	return userDomain, nil

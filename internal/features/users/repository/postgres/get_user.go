@@ -29,7 +29,7 @@ func (r *UserRepository) GetUserById(ctx context.Context, id int) (domain.User, 
 		&userModel.ID,
 		&userModel.Version,
 		&userModel.FullName,
-		&userModel.PhoneNUmber,
+		&userModel.PhoneNumber,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -47,7 +47,7 @@ func (r *UserRepository) GetUserById(ctx context.Context, id int) (domain.User, 
 		userModel.ID,
 		userModel.Version,
 		userModel.FullName,
-		userModel.PhoneNUmber,
+		userModel.PhoneNumber,
 	)
 
 	return userDomain, nil

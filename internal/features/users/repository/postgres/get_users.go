@@ -36,7 +36,7 @@ func (r *UserRepository) GetUsers(
 			&userModel.ID,
 			&userModel.Version,
 			&userModel.FullName,
-			&userModel.PhoneNUmber,
+			&userModel.PhoneNumber,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan user: %w", err)
