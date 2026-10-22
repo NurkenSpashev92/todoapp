@@ -24,13 +24,18 @@ func NewHTTPResponseHander(log *core_logger.Logger, rw http.ResponseWriter) *HTT
 	}
 }
 
-func (h *HTTPResponseHandler) JSONRender(responseBody any, statusCode int) {
+func (h *HTTPResponseHandler) JSONResponse(responseBody any, statusCode int) {
 	h.rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	h.rw.WriteHeader(statusCode)
 
 	if err := json.NewEncoder(h.rw).Encode(responseBody); err != nil {
 		h.log.Error("write HTTP response", zap.Error(err))
 	}
+}
+
+func (h *HTTPResponseHandler) NoContentResponse() {
+	h.rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	h.rw.WriteHeader(http.StatusNoContent)
 }
 
 func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
@@ -73,5 +78,5 @@ func (h *HTTPResponseHandler) errorResponse(statusCode int, err error, msg strin
 		"error":   err.Error(),
 	}
 
-	h.JSONRender(response, statusCode)
+	h.JSONResponse(response, statusCode)
 }

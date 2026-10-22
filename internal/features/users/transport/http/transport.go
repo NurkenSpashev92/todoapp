@@ -15,6 +15,8 @@ type UsersHTTPHandler struct {
 type UserSerivce interface {
 	CreateUser(ctx context.Context, user domain.User) (domain.User, error)
 	GetUsers(ctx context.Context, limit, offset *int) ([]domain.User, error)
+	GetUserById(ctx context.Context, id int) (domain.User, error)
+	DeleteUserById(ctx context.Context, id int) error
 }
 
 func NewUsersHTTPHander(userService UserSerivce) *UsersHTTPHandler {
@@ -34,6 +36,16 @@ func (h *UsersHTTPHandler) Routes() []core_http_server.Route {
 			Method:  http.MethodGet,
 			Path:    "/users",
 			Handler: h.GetUsers,
+		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/users/{user_id}",
+			Handler: h.GetUserById,
+		},
+		{
+			Method:  http.MethodDelete,
+			Path:    "/users/{user_id}",
+			Handler: h.DeleteUserById,
 		},
 	}
 }

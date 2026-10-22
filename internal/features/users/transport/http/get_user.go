@@ -9,46 +9,41 @@ import (
 	core_http_utils "github.com/nurkenspashev92/todoapp/internal/core/transport/http/utls"
 )
 
-type GetUserResponse []UserDTOResponse
+type GetUserResponse UserDTOResponse
 
-func (h *UsersHTTPHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
+func (h *UsersHTTPHandler) GetUserById(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHander(log, rw)
 
-	limit, offset, err := getLimitOffsetQueryParams(r)
+	userId, err := getUserIdQueryParam(r)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed get 'limit'/'offset' query params",
+			"faild to get user_id in service",
 		)
 		return
 	}
 
-	userDomains, err := h.userService.GetUsers(ctx, limit, offset)
+	userDomain, err := h.userService.GetUserById(ctx, userId)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed to get users in service",
+			"failed to get user in service",
 		)
 		return
 	}
 
-	response := GetUserResponse(usersDTOFromDomain(userDomains))
+	response := GetUserResponse(userDTOFromDomain(userDomain))
 
-	responseHandler.JSONRender(response, http.StatusOK)
+	responseHandler.JSONResponse(response, http.StatusOK)
 }
 
-func getLimitOffsetQueryParams(r *http.Request) (*int, *int, error) {
-	limit, err := core_http_utils.GetIntQueryParam(r, "limit")
+func getUserIdQueryParam(r *http.Request) (int, error) {
+	userId, err := core_http_utils.GetIntPathValue(r, "user_id")
 	if err != nil {
-		return nil, nil, fmt.Errorf("get 'limit' query param: %w", err)
+		return 0, fmt.Errorf("get `user_id` query param: %w", err)
 	}
 
-	offset, err := core_http_utils.GetIntQueryParam(r, "offset")
-	if err != nil {
-		return nil, nil, fmt.Errorf("get 'offset' query param: %w", err)
-	}
-
-	return limit, offset, nil
+	return userId, nil
 }

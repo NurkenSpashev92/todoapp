@@ -39,7 +39,7 @@ func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 	response := CreateUserResponse(userDTOFromDomain(userDomain))
 
-	responseHandler.JSONRender(response, http.StatusCreated)
+	responseHandler.JSONResponse(response, http.StatusCreated)
 }
 
 func dominFromDTO(dto CreateUserRequest) domain.User {
