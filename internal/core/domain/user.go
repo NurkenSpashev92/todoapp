@@ -15,21 +15,21 @@ type User struct {
 	PhoneNumber *string
 }
 
-func NewUser(id int, version int, fullName string, phoneNumber *string) User {
+func NewUser(id int, version int, fullName string, PhoneNumber *string) User {
 	return User{
 		ID:          id,
 		Version:     version,
 		FullName:    fullName,
-		PhoneNumber: phoneNumber,
+		PhoneNumber: PhoneNumber,
 	}
 }
 
-func NewUserUninitialized(fullName string, phoneNumber *string) User {
+func NewUserUninitialized(fullName string, PhoneNumber *string) User {
 	return NewUser(
 		UninitializedID,
 		UninitializedVersion,
 		fullName,
-		phoneNumber,
+		PhoneNumber,
 	)
 }
 
@@ -44,11 +44,11 @@ func (u *User) Validate() error {
 	}
 
 	if u.PhoneNumber != nil {
-		phoneNumberLength := len([]rune(*u.PhoneNumber))
-		if phoneNumberLength < 10 || phoneNumberLength > 15 {
+		PhoneNumberLength := len([]rune(*u.PhoneNumber))
+		if PhoneNumberLength < 10 || PhoneNumberLength > 15 {
 			return fmt.Errorf(
 				"invalide `PhoneNumber` len: %d %w",
-				phoneNumberLength,
+				PhoneNumberLength,
 				core_errors.ErrInvlidArgument,
 			)
 		}
@@ -61,6 +61,46 @@ func (u *User) Validate() error {
 			)
 		}
 	}
+
+	return nil
+}
+
+type UserPatch struct {
+	FullName    Nullable[string]
+	PhoneNumber Nullable[string]
+}
+
+func (u *UserPatch) Validate() error {
+	if u.FullName.Set && u.FullName.Value == nil {
+		return fmt.Errorf(
+			"FullName can't be patched to NULL: %w",
+			core_errors.ErrInvlidArgument,
+		)
+	}
+
+	return nil
+}
+
+func (u *User) ApplyPatch(patch UserPatch) error {
+	if err := patch.Validate(); err != nil {
+		return fmt.Errorf("validate user patch: %w", err)
+	}
+
+	tmp := *u
+
+	if patch.FullName.Set {
+		tmp.FullName = *patch.FullName.Value
+	}
+
+	if patch.PhoneNumber.Set {
+		tmp.PhoneNumber = patch.PhoneNumber.Value
+	}
+
+	if err := tmp.Validate(); err != nil {
+		return fmt.Errorf("validate patched user: %w", err)
+	}
+
+	*u = tmp
 
 	return nil
 }

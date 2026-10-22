@@ -7,11 +7,20 @@ import (
 	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 )
 
-func (s *UserSerivce) UpdateUserById(ctx context.Context, id int, user domain.User) (domain.User, error) {
-	user, err := s.userRepository.UpdateUserById(ctx, id, user)
+func (s *UserSerivce) PatchUserById(ctx context.Context, id int, patch domain.UserPatch) (domain.User, error) {
+	user, err := s.userRepository.GetUserById(ctx, id)
 	if err != nil {
-		return domain.User{}, fmt.Errorf("faild to get user from repository: %w", err)
+		return domain.User{}, fmt.Errorf("user not found: %w", err)
 	}
 
-	return user, nil
+	if err := user.ApplyPatch(patch); err != nil {
+		return domain.User{}, fmt.Errorf("apply user patch: %w", err)
+	}
+
+	patchedUser, err := s.userRepository.PatchUserById(ctx, id, user)
+	if err != nil {
+		return domain.User{}, fmt.Errorf("faild to update user from repository: %w", err)
+	}
+
+	return patchedUser, nil
 }

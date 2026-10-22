@@ -6,7 +6,7 @@ type UserModel struct {
 	ID          int
 	Version     int
 	FullName    string
-	PhoneNUmber *string
+	PhoneNumber *string
 }
 
 func userDomainsFromModels(users []UserModel) []domain.User {
@@ -17,7 +17,7 @@ func userDomainsFromModels(users []UserModel) []domain.User {
 			user.ID,
 			user.Version,
 			user.FullName,
-			user.PhoneNUmber,
+			user.PhoneNumber,
 		)
 	}
 

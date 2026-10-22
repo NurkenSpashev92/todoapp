@@ -1,22 +1,47 @@
 package users_transport_http
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 	core_logger "github.com/nurkenspashev92/todoapp/internal/core/logger"
 	core_http_request "github.com/nurkenspashev92/todoapp/internal/core/transport/http/request"
 	core_http_response "github.com/nurkenspashev92/todoapp/internal/core/transport/http/response"
+	core_http_types "github.com/nurkenspashev92/todoapp/internal/core/transport/http/types"
 )
 
-type UpdateUserRequest struct {
-	FullName    string  `json:"full_name" validate:"omitempty,min=3,max=100"`
-	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"`
+type PatchUserRequest struct {
+	FullName    core_http_types.Nullable[string] `json:"full_name"`
+	PhoneNumber core_http_types.Nullable[string] `json:"phone_number"`
+}
+
+func (r *PatchUserRequest) Validate() error {
+	if r.FullName.Set {
+		if r.FullName.Value == nil {
+			return fmt.Errorf("FullNmae can't be NULL")
+		}
+	}
+
+	if r.PhoneNumber.Set {
+		phoneNumberLen := len([]rune(*r.PhoneNumber.Value))
+		if phoneNumberLen < 10 || phoneNumberLen > 15 {
+			return fmt.Errorf("PhoneNumber can't must be between 10 and 15")
+		}
+
+		if !strings.HasPrefix(*r.PhoneNumber.Value, "+") {
+			return fmt.Errorf("PhoneNumber must startswith +")
+		}
+	}
+
+	return nil
 }
 
 type UpdatedUserResponse UserDTOResponse
 
-func (h *UsersHTTPHandler) UpdateUserById(rw http.ResponseWriter, r *http.Request) {
-	var request UpdateUserRequest
+func (h *UsersHTTPHandler) PatchUserById(rw http.ResponseWriter, r *http.Request) {
+	var request PatchUserRequest
 
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
@@ -39,9 +64,9 @@ func (h *UsersHTTPHandler) UpdateUserById(rw http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	user := dominFromDTO(CreateUserRequest(request))
+	userPatch := userPatchFromRequest(request)
 
-	userDomain, err := h.userService.UpdateUserById(ctx, userId, user)
+	userDomain, err := h.userService.PatchUserById(ctx, userId, userPatch)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
@@ -53,4 +78,11 @@ func (h *UsersHTTPHandler) UpdateUserById(rw http.ResponseWriter, r *http.Reques
 	response := UpdatedUserResponse(userDTOFromDomain(userDomain))
 
 	responseHandler.JSONResponse(response, http.StatusOK)
+}
+
+func userPatchFromRequest(request PatchUserRequest) domain.UserPatch {
+	return domain.UserPatch{
+		FullName:    request.FullName.ToDomain(),
+		PhoneNumber: request.PhoneNumber.ToDomain(),
+	}
 }
