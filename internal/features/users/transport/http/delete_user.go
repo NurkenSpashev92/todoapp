@@ -12,7 +12,7 @@ func (h *UsersHTTPHandler) DeleteUserById(rw http.ResponseWriter, r *http.Reques
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHander(log, rw)
 
-	userId, err := getUserIdQueryParam(r)
+	id, err := getUserIdQueryParam(r)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
@@ -21,7 +21,7 @@ func (h *UsersHTTPHandler) DeleteUserById(rw http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := h.userService.DeleteUserById(ctx, userId); err != nil {
+	if err := h.userService.DeleteUserById(ctx, id); err != nil {
 		responseHandler.ErrorResponse(
 			err,
 			"failed to delete user in service",

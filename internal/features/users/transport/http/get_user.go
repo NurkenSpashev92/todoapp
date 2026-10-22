@@ -20,7 +20,7 @@ func (h *UsersHTTPHandler) GetUserById(rw http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"faild to get user_id in service",
+			"faild to get id in service",
 		)
 		return
 	}
@@ -40,9 +40,9 @@ func (h *UsersHTTPHandler) GetUserById(rw http.ResponseWriter, r *http.Request) 
 }
 
 func getUserIdQueryParam(r *http.Request) (int, error) {
-	userId, err := core_http_utils.GetIntPathValue(r, "user_id")
+	userId, err := core_http_utils.GetIntPathValue(r, "id")
 	if err != nil {
-		return 0, fmt.Errorf("get `user_id` query param: %w", err)
+		return 0, fmt.Errorf("get `id` query param: %w", err)
 	}
 
 	return userId, nil

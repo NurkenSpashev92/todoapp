@@ -7,8 +7,8 @@ import (
 	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 )
 
-func (s *UserSerivce) GetUserById(ctx context.Context, userId int) (domain.User, error) {
-	user, err := s.userRepository.GetUserById(ctx, userId)
+func (s *UserSerivce) GetUserById(ctx context.Context, id int) (domain.User, error) {
+	user, err := s.userRepository.GetUserById(ctx, id)
 	if err != nil {
 		return domain.User{}, fmt.Errorf("faild to get user from repository: %w", err)
 	}

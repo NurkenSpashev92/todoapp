@@ -11,7 +11,7 @@ import (
 	core_errors "github.com/nurkenspashev92/todoapp/internal/core/errors"
 )
 
-func (r *UserRepository) GetUserById(ctx context.Context, userId int) (domain.User, error) {
+func (r *UserRepository) GetUserById(ctx context.Context, id int) (domain.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
@@ -21,7 +21,7 @@ func (r *UserRepository) GetUserById(ctx context.Context, userId int) (domain.Us
 	WHERE id=$1
 	`
 
-	row := r.pool.QueryRow(ctx, query, userId)
+	row := r.pool.QueryRow(ctx, query, id)
 
 	var userModel UserModel
 
@@ -35,7 +35,7 @@ func (r *UserRepository) GetUserById(ctx context.Context, userId int) (domain.Us
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.User{}, fmt.Errorf(
 				"user not found by id=%d: %w",
-				userId,
+				id,
 				core_errors.ErrNotFound,
 			)
 		}

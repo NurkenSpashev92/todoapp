@@ -7,7 +7,7 @@ import (
 	core_errors "github.com/nurkenspashev92/todoapp/internal/core/errors"
 )
 
-func (r *UserRepository) DeleteUserById(ctx context.Context, userId int) error {
+func (r *UserRepository) DeleteUserById(ctx context.Context, id int) error {
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
@@ -16,13 +16,13 @@ func (r *UserRepository) DeleteUserById(ctx context.Context, userId int) error {
 	WHERE id=$1
 	`
 
-	cmdTag, err := r.pool.Exec(ctx, query, userId)
+	cmdTag, err := r.pool.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("exec query: %w", err)
 	}
 
 	if cmdTag.RowsAffected() == 0 {
-		return fmt.Errorf("user with id='%d' not found: %w", userId, core_errors.ErrNotFound)
+		return fmt.Errorf("user with id='%d' not found: %w", id, core_errors.ErrNotFound)
 	}
 
 	return nil

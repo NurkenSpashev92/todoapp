@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-func (s *UserSerivce) DeleteUserById(ctx context.Context, userId int) error {
-	if err := s.userRepository.DeleteUserById(ctx, userId); err != nil {
+func (s *UserSerivce) DeleteUserById(ctx context.Context, id int) error {
+	if err := s.userRepository.DeleteUserById(ctx, id); err != nil {
 		return fmt.Errorf("faild to delete user from repository: %w", err)
 	}
 
