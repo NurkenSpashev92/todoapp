@@ -11,6 +11,11 @@ import (
 
 type GetUsersResponse []UserDTOResponse
 
+const (
+	limitQueryParamsKey  = "limit"
+	offsetQueryParamsKey = "offset"
+)
+
 func (h *UsersHTTPHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
@@ -40,12 +45,12 @@ func (h *UsersHTTPHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
 }
 
 func getLimitOffsetQueryParams(r *http.Request) (*int, *int, error) {
-	limit, err := core_http_request.GetIntQueryParam(r, "limit")
+	limit, err := core_http_request.GetIntQueryParam(r, limitQueryParamsKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("get 'limit' query param: %w", err)
 	}
 
-	offset, err := core_http_request.GetIntQueryParam(r, "offset")
+	offset, err := core_http_request.GetIntQueryParam(r, offsetQueryParamsKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("get 'offset' query param: %w", err)
 	}
