@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	core_logger "github.com/nurkenspashev92/todoapp/internal/core/logger"
+	core_http_request "github.com/nurkenspashev92/todoapp/internal/core/transport/http/request"
 	core_http_response "github.com/nurkenspashev92/todoapp/internal/core/transport/http/response"
-	core_http_utils "github.com/nurkenspashev92/todoapp/internal/core/transport/http/utls"
 )
 
 type GetUserResponse UserDTOResponse
@@ -40,7 +40,7 @@ func (h *UsersHTTPHandler) GetUserById(rw http.ResponseWriter, r *http.Request) 
 }
 
 func getUserIdQueryParam(r *http.Request) (int, error) {
-	userId, err := core_http_utils.GetIntPathValue(r, "id")
+	userId, err := core_http_request.GetIntPathValue(r, "id")
 	if err != nil {
 		return 0, fmt.Errorf("get `id` query param: %w", err)
 	}
