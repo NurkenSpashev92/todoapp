@@ -2,9 +2,14 @@ package tasks_postgres_repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+
 	"github.com/nurkenspashev92/todoapp/internal/core/domain"
+	core_errors "github.com/nurkenspashev92/todoapp/internal/core/errors"
 )
 
 func (r *TaskRepository) CreateTask(ctx context.Context, task domain.Task) (domain.Task, error) {
@@ -40,6 +45,20 @@ func (r *TaskRepository) CreateTask(ctx context.Context, task domain.Task) (doma
 		&taskModel.AuthorUserId,
 	)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Task{}, fmt.Errorf(
+				"task not found: %w",
+				core_errors.ErrNotFound,
+			)
+		}
+
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23503" {
+				return domain.Task{}, fmt.Errorf("violates foreign key: %w", err)
+			}
+		}
+
 		return domain.Task{}, fmt.Errorf("scan error: %w", err)
 	}
 
