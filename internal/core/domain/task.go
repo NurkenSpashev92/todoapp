@@ -62,9 +62,9 @@ func NewTaskUninitialized(
 
 func (t *Task) Validate() error {
 	titleLen := len([]rune(t.Title))
-	if titleLen < 1 || titleLen > 1000 {
+	if titleLen < 1 || titleLen > 100 {
 		return fmt.Errorf(
-			"invalide `Title` len: %d %w",
+			"invalide `Title` len: %d: %w",
 			titleLen,
 			core_errors.ErrInvlidArgument,
 		)
@@ -74,8 +74,31 @@ func (t *Task) Validate() error {
 		descriptionLen := len([]rune(*t.Description))
 		if descriptionLen < 1 || descriptionLen > 1000 {
 			return fmt.Errorf(
-				"invalide `Description` len: %d %w",
+				"invalide `Description` len: %d: %w",
 				descriptionLen,
+				core_errors.ErrInvlidArgument,
+			)
+		}
+	}
+
+	if t.Completed {
+		if t.CompletedAt == nil {
+			return fmt.Errorf(
+				"`CompletedAt` can't be nil if `Completed`==`true`: %w",
+				core_errors.ErrInvlidArgument,
+			)
+		}
+
+		if t.CompletedAt.Before(t.CreatedAt) {
+			return fmt.Errorf(
+				"`CompletedAt` can't be before `CreatedAt`: %w",
+				core_errors.ErrInvlidArgument,
+			)
+		}
+	} else {
+		if t.CompletedAt != nil {
+			return fmt.Errorf(
+				"`CompletedAt` must be nil if `Completed`==`false`: %w",
 				core_errors.ErrInvlidArgument,
 			)
 		}

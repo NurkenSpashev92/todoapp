@@ -11,7 +11,7 @@ import (
 )
 
 type CreateTaskRequest struct {
-	Title        string     `json:"title" validate:"required,min=1,max=1000"`
+	Title        string     `json:"title" validate:"required,min=1,max=100"`
 	Description  *string    `json:"description" validate:"omitempty,min=1,max=1000"`
 	Completed    bool       `json:"completed" default:"false"`
 	CreatedAt    time.Time  `json:"created_at"`
