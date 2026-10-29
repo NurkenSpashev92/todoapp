@@ -7,7 +7,7 @@ import (
 	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 )
 
-func (s *TaskService) CreateUser(ctx context.Context, task domain.Task) (domain.Task, error) {
+func (s *TaskService) CreateTask(ctx context.Context, task domain.Task) (domain.Task, error) {
 	if err := task.Validate(); err != nil {
 		return domain.Task{}, fmt.Errorf("validate taks doamin: %w", err)
 	}

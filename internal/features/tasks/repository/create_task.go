@@ -12,9 +12,9 @@ func (r *TaskRepository) CreateTask(ctx context.Context, task domain.Task) (doma
 	defer cancel()
 
 	query := `
-	INSERT INTO todoapp.tasks(title, description, completed, author_user_id)
-	VALUED ($1, $2, $3, $4)
-	RETURNING id, version, title, description, completed, author_user_id;
+	INSERT INTO todoapp.tasks(title, description, completed, created_at, completed_at, author_user_id)
+	VALUES ($1, $2, $3, $4, $5, $6)
+	RETURNING id, version, title, description, completed, created_at, completed_at, author_user_id;
 	`
 
 	row := r.pool.QueryRow(
@@ -23,6 +23,8 @@ func (r *TaskRepository) CreateTask(ctx context.Context, task domain.Task) (doma
 		task.Title,
 		task.Description,
 		task.Completed,
+		task.CreatedAt,
+		task.CompletedAt,
 		task.AuthorUserId,
 	)
 
@@ -33,6 +35,8 @@ func (r *TaskRepository) CreateTask(ctx context.Context, task domain.Task) (doma
 		&taskModel.Title,
 		&taskModel.Description,
 		&taskModel.Completed,
+		&taskModel.CreatedAt,
+		&taskModel.CompletedAt,
 		&taskModel.AuthorUserId,
 	)
 	if err != nil {

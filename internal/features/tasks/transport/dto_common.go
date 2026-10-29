@@ -1,14 +1,20 @@
 package tasks_transport_http
 
-import "github.com/nurkenspashev92/todoapp/internal/core/domain"
+import (
+	"time"
+
+	"github.com/nurkenspashev92/todoapp/internal/core/domain"
+)
 
 type TaskDTOResponse struct {
-	ID           int     `json:"id"`
-	Version      int     `json:"version"`
-	Title        string  `json:"title"`
-	Description  *string `json:"description"`
-	Completed    bool    `json:"completed"`
-	AuthorUserId int     `json:"author_user_id"`
+	ID           int        `json:"id"`
+	Version      int        `json:"version"`
+	Title        string     `json:"title"`
+	Description  *string    `json:"description"`
+	Completed    bool       `json:"completed"`
+	CreatedAt    time.Time  `json:"created_at"`
+	CompletedAt  *time.Time `json:"completed_at"`
+	AuthorUserId int        `json:"author_user_id"`
 }
 
 func taskDTOFromDomain(task domain.Task) TaskDTOResponse {
@@ -18,6 +24,8 @@ func taskDTOFromDomain(task domain.Task) TaskDTOResponse {
 		Title:        task.Title,
 		Description:  task.Description,
 		Completed:    task.Completed,
+		CreatedAt:    task.CreatedAt,
+		CompletedAt:  task.CompletedAt,
 		AuthorUserId: task.AuthorUserId,
 	}
 }
