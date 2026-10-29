@@ -23,8 +23,6 @@ func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHander(log, rw)
 
-	log.Debug("invoke CreateUser handler")
-
 	if err := core_http_request.DecodeAndValidate(r, &request); err != nil {
 		responseHandler.ErrorResponse(err, "failed to decode and validate HTTP request")
 		return
