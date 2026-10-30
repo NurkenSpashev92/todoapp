@@ -12,6 +12,7 @@ type TaskService struct {
 
 type TaskRepositoryInterface interface {
 	CreateTask(ctx context.Context, task domain.Task) (domain.Task, error)
+	GetTasks(ctx context.Context, limit *int, offset *int) ([]domain.Task, error)
 }
 
 func NewTaskService(taskRepository TaskRepositoryInterface) *TaskService {
