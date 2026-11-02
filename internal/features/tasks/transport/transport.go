@@ -1,26 +1,17 @@
 package tasks_transport_http
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 	core_http_server "github.com/nurkenspashev92/todoapp/internal/core/transport/http/server"
+	tasks_service "github.com/nurkenspashev92/todoapp/internal/features/tasks/service"
 )
 
 type TasksHTTPHandler struct {
-	taskService TaskService
+	taskService tasks_service.TaskServiceInterface
 }
 
-type TaskService interface {
-	CreateTask(ctx context.Context, task domain.Task) (domain.Task, error)
-	GetTasks(ctx context.Context, limit *int, offset *int) ([]domain.Task, error)
-	GetTaskById(ctx context.Context, id int) (domain.Task, error)
-	DeleteTaskById(ctx context.Context, id int) error
-	PatchTaskById(ctx context.Context, id int, patch domain.TaskPatch) (domain.Task, error)
-}
-
-func NewTaskHTTPHandler(taskService TaskService) *TasksHTTPHandler {
+func NewTaskHTTPHandler(taskService tasks_service.TaskServiceInterface) *TasksHTTPHandler {
 	return &TasksHTTPHandler{
 		taskService: taskService,
 	}

@@ -9,6 +9,7 @@ import (
 
 func (r *TaskRepository) GetTasks(
 	ctx context.Context,
+	userId *int,
 	limit *int,
 	offset *int,
 ) ([]domain.Task, error) {
@@ -18,12 +19,13 @@ func (r *TaskRepository) GetTasks(
 	query := `
 	SELECT id, version, title, description, completed, created_at, completed_at, author_user_id
 	FROM todoapp.tasks
+	WHERE ($1::INTEGER IS NULL OR author_user_id=$1)
 	ORDER BY id ASC
-	LIMIT $1
-	OFFSET $2
+	LIMIT $2
+	OFFSET $3;
 	`
 
-	rows, err := r.pool.Query(ctx, query, limit, offset)
+	rows, err := r.pool.Query(ctx, query, userId, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed get tasks in repository %w", err)
 	}

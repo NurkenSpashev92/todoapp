@@ -12,6 +12,7 @@ import (
 type GetTasksResponse []TaskDTOResponse
 
 const (
+	userIdQueryParamsKey = "user_id"
 	limitQueryParamsKey  = "limit"
 	offsetQueryParamsKey = "offset"
 )
@@ -21,16 +22,25 @@ func (h *TasksHTTPHandler) GetTasks(rw http.ResponseWriter, r *http.Request) {
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHander(log, rw)
 
-	limit, offset, err := getLimitOffsetQueryParams(r)
+	userId, err := core_http_request.GetIntQueryParam(r, userIdQueryParamsKey)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed get 'limlt'/'offset' query params",
+			"failed get 'user_id' query param",
 		)
 		return
 	}
 
-	taskDomain, err := h.taskService.GetTasks(ctx, limit, offset)
+	limit, offset, err := getLimitOffsetQueryParams(r)
+	if err != nil {
+		responseHandler.ErrorResponse(
+			err,
+			"failed get 'limit'/'offset' query params",
+		)
+		return
+	}
+
+	taskDomain, err := h.taskService.GetTasks(ctx, userId, limit, offset)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,

@@ -1,26 +1,17 @@
 package users_transport_http
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/nurkenspashev92/todoapp/internal/core/domain"
 	core_http_server "github.com/nurkenspashev92/todoapp/internal/core/transport/http/server"
+	users_service "github.com/nurkenspashev92/todoapp/internal/features/users/service"
 )
 
 type UsersHTTPHandler struct {
-	userService UserSerivce
+	userService users_service.UserServiceInterface
 }
 
-type UserSerivce interface {
-	CreateUser(ctx context.Context, user domain.User) (domain.User, error)
-	GetUsers(ctx context.Context, limit, offset *int) ([]domain.User, error)
-	GetUserById(ctx context.Context, id int) (domain.User, error)
-	DeleteUserById(ctx context.Context, id int) error
-	PatchUserById(ctx context.Context, id int, patch domain.UserPatch) (domain.User, error)
-}
-
-func NewUsersHTTPHander(userService UserSerivce) *UsersHTTPHandler {
+func NewUsersHTTPHander(userService users_service.UserServiceInterface) *UsersHTTPHandler {
 	return &UsersHTTPHandler{
 		userService: userService,
 	}

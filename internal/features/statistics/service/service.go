@@ -1,20 +1,13 @@
 package statistics_service
 
 import (
-	"context"
-	"time"
-
-	"github.com/nurkenspashev92/todoapp/internal/core/domain"
+	statistics_repository "github.com/nurkenspashev92/todoapp/internal/features/statistics/repository"
 )
 
 type StatisticsService struct {
-	statisticsRepository StatisticsRepositoryInterface
+	statisticsRepository statistics_repository.StatisticsRepositoryInterface
 }
 
-type StatisticsRepositoryInterface interface {
-	GetStatistics(ctx context.Context, userId *int, from *time.Time, to *time.Time) (domain.Statistics, error)
-}
-
-func NewStatisticsService(statisticsRepository StatisticsRepositoryInterface) *StatisticsService {
+func NewStatisticsService(statisticsRepository statistics_repository.StatisticsRepositoryInterface) *StatisticsService {
 	return &StatisticsService{statisticsRepository: statisticsRepository}
 }

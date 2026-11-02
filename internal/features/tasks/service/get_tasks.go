@@ -10,9 +10,16 @@ import (
 
 func (s *TaskService) GetTasks(
 	ctx context.Context,
+	userId *int,
 	limit *int,
 	offset *int,
 ) ([]domain.Task, error) {
+	if userId != nil && *userId <= 0 {
+		return nil, fmt.Errorf(
+			"user_id must be positive: %w",
+			core_errors.ErrInvlidArgument,
+		)
+	}
 	if limit != nil && *limit < 0 {
 		return nil, fmt.Errorf(
 			"limit must be non-negative: %w",
@@ -26,7 +33,7 @@ func (s *TaskService) GetTasks(
 		)
 	}
 
-	tasks, err := s.taskRepository.GetTasks(ctx, limit, offset)
+	tasks, err := s.taskRepository.GetTasks(ctx, userId, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("faild to get tasks: %w", err)
 	}
