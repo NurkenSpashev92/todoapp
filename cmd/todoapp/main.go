@@ -14,6 +14,9 @@ import (
 	core_postgres_pool "github.com/nurkenspashev92/todoapp/internal/core/repository/postgres/pool"
 	core_http_middleware "github.com/nurkenspashev92/todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/nurkenspashev92/todoapp/internal/core/transport/http/server"
+	statistics_postgres_repository "github.com/nurkenspashev92/todoapp/internal/features/statistics/repository"
+	statistics_service "github.com/nurkenspashev92/todoapp/internal/features/statistics/service"
+	statistics_transport_http "github.com/nurkenspashev92/todoapp/internal/features/statistics/transport"
 	tasks_postgres_repository "github.com/nurkenspashev92/todoapp/internal/features/tasks/repository"
 	tasks_service "github.com/nurkenspashev92/todoapp/internal/features/tasks/service"
 	tasks_transport_http "github.com/nurkenspashev92/todoapp/internal/features/tasks/transport"
@@ -61,6 +64,11 @@ func main() {
 	taskService := tasks_service.NewTaskService(taskRepository)
 	tasksTransportHTTP := tasks_transport_http.NewTaskHTTPHandler(taskService)
 
+	logger.Debug("initializing feature", zap.String("feature", "statistics"))
+	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsTransportHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsService)
+
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewHTTPServer(
 		core_http_server.NewConfigMust(),
@@ -74,6 +82,7 @@ func main() {
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
 	apiVersionRouter.RegiserRoutes(usersTransportHTTP.Routes()...)
 	apiVersionRouter.RegiserRoutes(tasksTransportHTTP.Routes()...)
+	apiVersionRouter.RegiserRoutes(statisticsTransportHTTP.Routes()...)
 
 	httpServer.RegiserAPIRoutes(apiVersionRouter)
 

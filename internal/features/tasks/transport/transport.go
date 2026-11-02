@@ -15,6 +15,9 @@ type TasksHTTPHandler struct {
 type TaskService interface {
 	CreateTask(ctx context.Context, task domain.Task) (domain.Task, error)
 	GetTasks(ctx context.Context, limit *int, offset *int) ([]domain.Task, error)
+	GetTaskById(ctx context.Context, id int) (domain.Task, error)
+	DeleteTaskById(ctx context.Context, id int) error
+	PatchTaskById(ctx context.Context, id int, patch domain.TaskPatch) (domain.Task, error)
 }
 
 func NewTaskHTTPHandler(taskService TaskService) *TasksHTTPHandler {
@@ -34,6 +37,21 @@ func (h *TasksHTTPHandler) Routes() []core_http_server.Route {
 			Method:  http.MethodGet,
 			Path:    "/tasks",
 			Handler: h.GetTasks,
+		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/tasks/{id}",
+			Handler: h.GetTaskById,
+		},
+		{
+			Method:  http.MethodDelete,
+			Path:    "/tasks/{id}",
+			Handler: h.DeleteTaskById,
+		},
+		{
+			Method:  http.MethodPatch,
+			Path:    "/tasks/{id}",
+			Handler: h.PatchTaskById,
 		},
 	}
 }
