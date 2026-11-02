@@ -19,6 +19,17 @@ func (s *UserSerivce) GetUsers(
 			core_errors.ErrInvlidArgument,
 		)
 	}
+	if limit != nil && *limit > domain.MaxLimit {
+		return nil, fmt.Errorf(
+			"limit must be <= %d: %w",
+			domain.MaxLimit,
+			core_errors.ErrInvlidArgument,
+		)
+	}
+	if limit == nil {
+		defaultLimit := domain.DefaultLimit
+		limit = &defaultLimit
+	}
 	if offset != nil && *offset < 0 {
 		return nil, fmt.Errorf(
 			"offset must be non-negative: %w",

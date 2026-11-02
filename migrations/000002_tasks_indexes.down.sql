@@ -1,0 +1,1 @@
+DROP INDEX todoapp.idx_tasks_author_user_id_created_at;

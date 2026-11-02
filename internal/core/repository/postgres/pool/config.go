@@ -14,6 +14,7 @@ type Config struct {
 	Password string        `envconfig:"PASSWORD" required:"true"`
 	Databse  string        `envconfig:"DB" required:"true"`
 	Timeout  time.Duration `envconfig:"TIMEOUT" required:"true"`
+	MaxConns int32         `envconfig:"MAX_CONNS" default:"0"`
 }
 
 func NewConfig() (Config, error) {

@@ -29,8 +29,14 @@ func (r *TaskRepository) GetTasks(
 	if err != nil {
 		return nil, fmt.Errorf("failed get tasks in repository %w", err)
 	}
+	defer rows.Close()
 
-	var tasksDomain []TaskModel
+	capacity := domain.DefaultLimit
+	if limit != nil {
+		capacity = *limit
+	}
+
+	tasksDomain := make([]TaskModel, 0, capacity)
 	for rows.Next() {
 		var taskModel TaskModel
 

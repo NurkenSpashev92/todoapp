@@ -21,8 +21,8 @@ func GetIntPathValue(r *http.Request, key string) (int, error) {
 	value, err := strconv.Atoi(pathValue)
 	if err != nil {
 		return 0, fmt.Errorf(
-			"path value=`%s` by key=`%s` not valid integer: $%: %w",
-			value,
+			"path value=`%s` by key=`%s` not valid integer: %v: %w",
+			pathValue,
 			key,
 			err,
 			core_errors.ErrInvlidArgument,

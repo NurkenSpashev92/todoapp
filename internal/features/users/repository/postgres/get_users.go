@@ -27,8 +27,14 @@ func (r *UserRepository) GetUsers(
 	if err != nil {
 		return nil, fmt.Errorf("failed get users in repositroy: %w", err)
 	}
+	defer rows.Close()
 
-	var usersDomain []UserModel
+	capacity := domain.DefaultLimit
+	if limit != nil {
+		capacity = *limit
+	}
+
+	usersDomain := make([]UserModel, 0, capacity)
 	for rows.Next() {
 		var userModel UserModel
 
